@@ -69,7 +69,7 @@ export default async (req: Request, context) => {
 };
 
 export const config = {
-  path: "/fn/like",
+  path: "/api/like",
 };
 
 // Shared with netlify/edge-functions/likes.ts
