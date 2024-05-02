@@ -6,30 +6,11 @@ const supabase = createClient(
   Netlify.env.get("SUPABASE_LIKES_KEY")
 );
 
-const IS_DEV = Netlify.env.get("NETLIFY_DEV");
-
 const headers = {
   "access-control-allow-origin": "*",
 };
 
-export default async (req: Request, context) => {
-  const referer = req.headers.get("referer");
-  const isInvalidReferer =
-    referer && new URL(referer).origin !== context.site.url;
-
-  if (!IS_DEV && isInvalidReferer) {
-    return Response.json(
-      {
-        error: "Not authorized",
-        metadata: {
-          referer,
-          url: context.site.url,
-        },
-      },
-      { headers, status: 401 }
-    );
-  }
-
+export default async (req: Request) => {
   const requestURL = new URL(req.url);
   let slug = requestURL.searchParams.get("slug");
 
