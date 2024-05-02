@@ -1,1 +1,3 @@
-The backend for likes on seanmcp.com
+# Functions
+
+Serverless functions for [seanmcp.com](https://seanmcp.com)
