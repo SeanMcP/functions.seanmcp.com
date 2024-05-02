@@ -8,6 +8,10 @@ const supabase = createClient(
 
 const IS_DEV = Netlify.env.get("NETLIFY_DEV");
 
+const headers = {
+  "access-control-allow-origin": "*",
+};
+
 export default async (req: Request, context) => {
   const referer = req.headers.get("referer");
   const isInvalidReferer =
@@ -22,13 +26,13 @@ export default async (req: Request, context) => {
           url: context.site.url,
         },
       },
-      { status: 401 }
+      { headers, status: 401 }
     );
   }
 
   const requestURL = new URL(req.url);
   let slug = requestURL.searchParams.get("slug");
-  slug = normalizeSlug(slug);
+  slug = normalizeSlug(slug || "");
 
   try {
     if (slug) {
@@ -40,9 +44,12 @@ export default async (req: Request, context) => {
         .single();
 
       if (exists.data) {
-        return Response.json({ count: exists.data.count }, { status: 200 });
+        return Response.json(
+          { count: exists.data.count },
+          { headers, status: 200 }
+        );
       } else {
-        return Response.json({ count: 0 }, { status: 200 });
+        return Response.json({ count: 0 }, { headers, status: 200 });
       }
     }
     // Return all slugs and counts
@@ -55,9 +62,9 @@ export default async (req: Request, context) => {
       throw ordered.error;
     }
 
-    return Response.json({ data: ordered.data }, { status: 200 });
+    return Response.json({ data: ordered.data }, { headers, status: 200 });
   } catch (error) {
-    return Response.json({ error }, { status: 500 });
+    return Response.json({ error }, { headers, status: 500 });
   }
 };
 

@@ -8,6 +8,10 @@ const supabase = createClient(
 
 const IS_DEV = Netlify.env.get("NETLIFY_DEV");
 
+const headers = {
+  "access-control-allow-origin": "*",
+};
+
 export default async (req: Request, context) => {
   const referer = req.headers.get("referer");
   const isInvalidReferer =
@@ -22,7 +26,7 @@ export default async (req: Request, context) => {
           url: context.site.url,
         },
       },
-      { status: 401 }
+      { headers, status: 401 }
     );
   }
 
@@ -30,7 +34,7 @@ export default async (req: Request, context) => {
   let slug = requestURL.searchParams.get("slug");
 
   if (!slug) {
-    return Response.json({ error: "Missing slug" }, { status: 400 });
+    return Response.json({ error: "Missing slug" }, { headers, status: 400 });
   }
 
   slug = normalizeSlug(slug);
@@ -53,7 +57,7 @@ export default async (req: Request, context) => {
         throw update.error;
       }
 
-      return Response.json({ count: next }, { status: 200 });
+      return Response.json({ count: next }, { headers, status: 200 });
     } else {
       const create = await supabase.from("likes").insert({ slug });
 
@@ -61,10 +65,10 @@ export default async (req: Request, context) => {
         throw create.error;
       }
 
-      return Response.json({ count: 1 }, { status: 200 });
+      return Response.json({ count: 1 }, { headers, status: 200 });
     }
   } catch (error) {
-    return Response.json({ error }, { status: 500 });
+    return Response.json({ error }, { headers, status: 500 });
   }
 };
 
